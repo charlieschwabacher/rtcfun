@@ -1,3 +1,7 @@
+- abe was right about ice exchange
+http://www.html5rocks.com/en/tutorials/webrtc/basics/#toc-signaling
+
+
 Notes:
 
 - a new client sends 'join' message to the server w/ room name as payload

@@ -7,8 +7,8 @@ require('build-status').client() if process.env.NODE_ENV is 'development'
 
 
 ws = new WS 'ws://localhost:3002'
-configuration = iceServers: [url: 'stun:stun.l.google.com:19302']
-
+servers = iceServers: [url: 'stun:stun.l.google.com:19302']
+config = optional: [RtpDataChannels: true]
 
 pendingConnections = {}
 peers = {}
@@ -36,7 +36,18 @@ ws.on 'open', ->
 
 ws.on 'request offer', ({room, from}) ->
   console.log 'received request for offer'
-  pc = new RTCPeerConnection configuration
+  pc = new RTCPeerConnection servers, config
+
+  pc.onicecandidate = (e) ->
+    console.log 'ice candidate!'
+    console.log e
+    console.log e.candidate
+    console.log Object.keys e.candidate
+
+  pc.oniceconnectionstatechange = (e) ->
+    console.log 'ice connection state change'
+    console.log e
+
   pc.createOffer (localDescription) ->
     pc.setLocalDescription localDescription, ->
       sdp = localDescription.sdp
@@ -48,7 +59,12 @@ ws.on 'request offer', ({room, from}) ->
 
 ws.on 'offer', ({room, from, sdp}) ->
   console.log 'received offer'
-  pc = new RTCPeerConnection configuration
+
+  pc = new RTCPeerConnection servers, config
+  pc.onicecandidate = (e) ->
+    console.log 'ice candidate!'
+  console.log pc
+
   remoteDescription = new SessionDescription {sdp, type: 'offer'}
   pc.setRemoteDescription remoteDescription, ->
     pc.createAnswer (localDescription) ->
@@ -70,10 +86,8 @@ ws.on 'answer', ({room, from, sdp}) ->
   pc = pendingConnections[room][from]
   remoteDescription = new SessionDescription {sdp, type: 'answer'}
   pc.setRemoteDescription remoteDescription, ->
+    console.log 'creating data channel'
     dc = pc.createDataChannel "#{room}:#{from}", ordered: false
-    console.log 'created data channel'
-    console.log dc
-    window.dc = dc
     dc.addEventListener 'error', ->
       console.log 'data channel error'
       console.log arguments
