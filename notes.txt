@@ -1,0 +1,26 @@
+Notes:
+
+- a new client sends 'join' message to the server w/ room name as payload
+
+- the server sends 'request offer' message to clients in room w/ the id of the
+new client as payload
+
+- the clients in the room create RTCPeerConnections and offers, send 'offer'
+messages to the server w/ offer sdp and new client id as payload
+
+- the server sends 'offer' messages to new client w/ the offer sdp and
+the offering client id as payload
+
+- the new client creates an RTCPeerConnection and answer, sends an 'answer'
+message to server with answer sdp and offering client id as payload
+
+- the server sends an 'answer' message to the offering client with the answer
+sdp and answering client id as payload
+
+- the offering client creates a data channel to new client
+
+
+
+
+server gets 'candidate', 'join', 'offer', 'answer'
+client gets 'request candidate', 'candidate', 'request offer', 'offer', 'answer'
