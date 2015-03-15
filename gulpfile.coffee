@@ -40,18 +40,19 @@ gulp.task 'static-server', ->
 
 # run a peer signaling server (reloading source files)
 
-server = null
+ultrawaveServer = null
 
 reloadServer = ->
   if server?
-    server.stop()
+    ultrawaveServer.stop()
     delete require.cache[k] for k, v of require.cache
 
   try
-    server = new (require './server/signaling_server')
+    ultrawaveServer = new (require './server/ultrawave_server')
   catch e
     console.log "ERROR LOADING SERVER"
     console.log e
+
 
 # build javascript assets
 

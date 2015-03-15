@@ -1,40 +1,38 @@
 ws = require 'ws'
+MapSet = require '../scripts/util/map_set'
 WebSocketServer = ws.Server
 
 module.exports = class WSServer
 
   constructor: ->
     @wss = new WebSocketServer port: 3002
-    @handlers = {}
-    @sockets = {}
+    @handlers = new MapSet
+    @sockets = new Map
 
     idCounter = 0
 
     @wss.on 'connection', (ws) =>
       id = idCounter += 1
-      @sockets[id] = ws
+      @sockets.set id, ws
 
-      handler id for handler in @handlers.open if @handlers.open?
+      @handlers.get('open')?.forEach (handler) -> handler id
 
       ws.addEventListener 'close', (e) =>
-        delete @sockets[id]
-        handler id for handler in @handlers.close if @handlers.close?
+        @sockets.delete id
+        @handlers.get('close')?.forEach (handler) -> handler id
 
       ws.addEventListener 'message', (e) =>
         [type, payload] = JSON.parse e.data
-        handler id, payload for handler in @handlers[type] if @handlers[type]?
+        @handlers.get(type)?.forEach (handler) -> handler id, payload
 
   on: (type, callback) ->
-    @handlers[type] ||= []
-    @handlers[type].push callback
+    @handlers.add type, callback
 
   off: (type, callback) ->
-    return unless @handlers[type]?
-    index = @handlers[type].indexOf callback
-    @handlers[type].splice index, 1 if index isnt -1
+    @handlers.delete type, callback
 
   send: (id, type, payload) ->
-    @sockets[id].send JSON.stringify [type, payload]
+    @sockets.get(id)?.send JSON.stringify [type, payload]
 
   close: ->
     @wss.close()
