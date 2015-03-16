@@ -27,8 +27,6 @@ uw.on 'start', ->
   uw.join 'lobby'
   render()
 
-uw.on 'open', render
-uw.on 'close', render
 uw.on 'peer', render
 uw.on 'join', render
 uw.on 'leave', render

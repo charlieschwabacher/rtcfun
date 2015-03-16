@@ -17,7 +17,6 @@
     "vinyl-source-stream": "^1.0.0"
   },
   "dependencies": {
-    "blueimp-md5": "^1.1.0",
     "react": "^0.13.0",
     "ws": "^0.7.1"
   }

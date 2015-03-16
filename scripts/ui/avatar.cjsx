@@ -1,5 +1,4 @@
 React = require 'react'
-md5 = require('blueimp-md5').md5
 
 module.exports = React.createClass
 
@@ -15,5 +14,5 @@ module.exports = React.createClass
   render: ->
     <img
       className='avatar'
-      src={"//www.gravatar.com/avatar/#{md5 @props.user}?d=#{@props.default}"}
+      src={"//www.gravatar.com/avatar/#{@props.user}?d=#{@props.default}"}
     />
